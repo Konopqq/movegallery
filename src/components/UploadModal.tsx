@@ -45,7 +45,7 @@ export default function UploadModal({ isOpen, onClose, isAdmin }: UploadModalPro
 
   const handleSubmit = async () => {
     const userId = (session?.user as any)?.id;
-    // Отримуємо ім'я та аватар з сесії
+    
     const userName = session?.user?.name || 'Anonymous';
     const userAvatar = session?.user?.image || '';
     
@@ -82,14 +82,14 @@ export default function UploadModal({ isOpen, onClose, isAdmin }: UploadModalPro
 
       const status = isAdmin ? 'approved' : 'pending';
 
-      // ЗАПИСУЄМО ІМ'Я ТА АВАТАР В БАЗУ
+      
       const { error: dbErr } = await supabase.from('assets').insert([{
         title: title,
         category: category,
         file_path: fileName,
         discord_user_id: userId,
-        user_name: userName,     // <--- Нове поле
-        user_avatar: userAvatar, // <--- Нове поле
+        user_name: userName,     
+        user_avatar: userAvatar, 
         status: status
       }]);
 
@@ -153,7 +153,7 @@ export default function UploadModal({ isOpen, onClose, isAdmin }: UploadModalPro
 
           <div>
             <label className="block text-xs text-gray-500 mb-1.5 uppercase font-bold tracking-wider">Asset Title</label>
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-[#1A1A1A] border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] outline-none transition-all placeholder-gray-600 text-sm" placeholder="e.g. Cyberpunk City 2077" />
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-[#1A1A1A] border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] outline-none transition-all placeholder-gray-600 text-sm" placeholder="move" />
           </div>
 
           <div>
