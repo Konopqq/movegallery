@@ -8,7 +8,7 @@ export default function Home() {
   const [assets, setAssets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Стан для відкритої картинки (Full Screen)
+  
   const [selectedAsset, setSelectedAsset] = useState<any | null>(null);
 
   const searchParams = useSearchParams();
@@ -62,7 +62,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#050505] pt-24 pb-10 px-4 md:px-8">
       
-      {/* СІТКА З КАРТИНКАМИ */}
+      
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4ADE80]"></div>
@@ -72,12 +72,11 @@ export default function Home() {
           {assets.map((asset) => (
             <div 
               key={asset.id} 
-              // Додаємо onClick для відкриття
+
               onClick={() => setSelectedAsset(asset)}
               className="group relative bg-[#111] rounded-xl overflow-hidden border border-white/5 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 shadow-lg flex flex-col cursor-pointer"
             >
               
-              {/* Картинка */}
               <div className="aspect-[4/3] bg-black overflow-hidden relative">
                 <img 
                   src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${asset.file_path}`} 
@@ -87,7 +86,6 @@ export default function Home() {
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
-                {/* Кнопка скачування (stopPropagation важливий, щоб не відкривалась модалка при скачуванні) */}
                 <button 
                   onClick={(e) => {
                     e.stopPropagation(); 
@@ -100,7 +98,6 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Інформація */}
               <div className="p-4 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
                    <h3 className="text-white font-bold text-base truncate pr-2">{asset.title}</h3>
@@ -134,29 +131,27 @@ export default function Home() {
         </div>
       )}
 
-      {/* --- LIGHTBOX (МОДАЛЬНЕ ВІКНО НА ВЕСЬ ЕКРАН) --- */}
+
       {selectedAsset && (
         <div 
-            onClick={() => setSelectedAsset(null)} // Клік будь-де закриває
+            onClick={() => setSelectedAsset(null)} 
             className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out"
         >
-            {/* Кнопка закриття (для краси, хоча клік працює всюди) */}
+            
             <button className="absolute top-5 right-5 text-gray-400 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition">
                 <XMarkIcon className="h-8 w-8" />
             </button>
 
-            {/* Велика картинка */}
             <img 
                 src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${selectedAsset.file_path}`} 
                 alt={selectedAsset.title}
                 className="max-w-full max-h-full object-contain shadow-2xl rounded-sm"
                 onClick={(e) => {
-                    e.stopPropagation(); // Якщо хочете, щоб клік по самій картинці НЕ закривав (залиште цей рядок).
-                    setSelectedAsset(null); // Якщо хочете, щоб клік по картинці ТЕЖ закривав (як ви просили) - використовуйте цей рядок.
+                    e.stopPropagation(); 
+                    setSelectedAsset(null);
                 }}
             />
-            
-            {/* Інфо під картинкою (опціонально) */}
+
             <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-center pointer-events-none">
                 <p className="text-white font-bold text-lg text-shadow">{selectedAsset.title}</p>
                 <p className="text-gray-400 text-sm">by {selectedAsset.user_name || "Unknown"}</p>

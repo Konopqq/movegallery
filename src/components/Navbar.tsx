@@ -1,22 +1,45 @@
 "use client";
 import Link from 'next/link';
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react'; 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
 import UploadModal from './UploadModal';
-import NotificationBell from './NotificationBell'; // <--- 1. Додано імпорт
+import NotificationBell from './NotificationBell';
 
-export default function Navbar() {
+
+function NavbarInner() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentFilter = searchParams.get('filter') || 'all';
   
-  // Стейт для відкриття модалки
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  const supabase = createClient();
 
-  // Перевірка на адміна
-  const isAdmin = session?.user?.image?.includes(process.env.NEXT_PUBLIC_ADMIN_ID || 'NO_ID') || false;
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const userId = (session?.user as any)?.id;
+      if (!userId) {
+        setIsAdmin(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('admins')
+        .select('id')
+        .eq('discord_id', userId)
+        .single();
+
+      if (data) setIsAdmin(true);
+      else setIsAdmin(false);
+    };
+
+    if (session) checkAdminStatus();
+  }, [session]);
 
   const setFilter = (cat: string) => {
     router.push(`/?filter=${cat}`);
@@ -34,7 +57,7 @@ export default function Navbar() {
     <>
       <nav className="fixed top-0 left-0 w-full z-50 bg-[#050505] border-b border-white/10 h-16 flex items-center justify-between px-6">
         
-        {/* Логотип */}
+        
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition shrink-0">
           <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
           <span className="text-lg font-bold text-white whitespace-nowrap">
@@ -42,7 +65,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Фільтри */}
+        
         <div className="hidden md:flex items-center gap-1 bg-[#111] p-1 rounded-lg border border-white/5">
           {['all', 'logo', 'moveus', 'fon', 'text', 'art'].map((cat) => (
               <button 
@@ -59,13 +82,11 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Права частина */}
+        
         <div className="flex items-center gap-4">
           
-          {/* 2. Дзвіночок (Показуємо тільки якщо є сесія, перед кнопкою Upload) */}
           {session && <NotificationBell />}
           
-          {/* Кнопка Upload */}
           <button 
              onClick={handleUploadClick}
              className="flex items-center gap-2 px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-md transition"
@@ -74,7 +95,6 @@ export default function Navbar() {
              <span className="text-sm font-bold text-white">Upload</span>
           </button>
 
-          {/* Профіль */}
           {session ? (
               <div className="relative group h-full flex items-center">
                   <img 
@@ -87,11 +107,13 @@ export default function Navbar() {
                           <Link href={`/profile/${session.user?.image?.split('/')[4]}`} className="px-3 py-2 text-sm text-gray-300 hover:bg-white/10 rounded text-left">
                               My Profile
                           </Link>
+                          
                           {isAdmin && (
-                            <Link href="/admin" className="px-3 py-2 text-sm text-yellow-400 hover:bg-white/10 rounded text-left">
+                            <Link href="/admin" className="px-3 py-2 text-sm text-yellow-400 hover:bg-white/10 rounded text-left font-bold">
                                 Admin Panel
                             </Link>
                           )}
+                          
                           <div className="h-[1px] bg-white/5 my-1"></div>
                           <button onClick={() => signOut()} className="px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded text-left">
                               Log Out
@@ -107,12 +129,20 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Підключаємо Модальне вікно */}
       <UploadModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        isAdmin={isAdmin}
+        isAdmin={isAdmin} 
       />
     </>
+  );
+}
+
+
+export default function Navbar() {
+  return (
+    <Suspense fallback={<div className="h-16 w-full bg-[#050505] border-b border-white/10 fixed top-0 z-50" />}>
+      <NavbarInner />
+    </Suspense>
   );
 }
