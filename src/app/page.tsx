@@ -19,14 +19,15 @@ function HomeContent() {
       setLoading(true);
       let query = supabase.from('assets').select('*').eq('status', 'approved').order('created_at', { ascending: false });
 
+      
       if (filter === 'official') {
          query = query.eq('is_official', true);
       } else if (filter !== 'all') {
          query = query.eq('category', filter);
       }
 
+      
       if (searchQuery) {
-         // Шукаємо в Title АБО в User Name
          query = query.or(`title.ilike.%${searchQuery}%,user_name.ilike.%${searchQuery}%`);
       }
 
@@ -77,6 +78,7 @@ function HomeContent() {
                 <div className="aspect-square bg-black relative">
                   <img src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${asset.file_path}`} alt={asset.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition duration-500" />
                   
+                  
                   {asset.is_official && (
                     <div className="absolute top-3 left-3 z-10 w-8 h-8 drop-shadow-lg">
                         <img src="/official.png" alt="Official" className="w-full h-full object-contain" />
@@ -104,14 +106,21 @@ function HomeContent() {
           </div>
         )}
 
+        
         {selectedAsset && (
             <div onClick={() => setSelectedAsset(null)} className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out">
                 <button className="absolute top-5 right-5 text-gray-400 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition">
                     <XMarkIcon className="h-8 w-8" />
                 </button>
+                
                 <div className="relative max-w-full max-h-full">
-                    <img src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${selectedAsset.file_path}`} alt={selectedAsset.title} className={`max-w-full max-h-[80vh] object-contain shadow-2xl rounded-sm ${selectedAsset.is_official ? 'border-2 border-yellow-500/50 shadow-[0_0_50px_rgba(234,179,8,0.2)]' : ''}`} onClick={(e) => { e.stopPropagation(); setSelectedAsset(null); }} />
-                    {selectedAsset.is_official && <img src="/official.png" className="absolute -top-6 -left-6 w-16 h-16 drop-shadow-xl" alt="Official" />}
+                    
+                    <img 
+                        src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${selectedAsset.file_path}`} 
+                        alt={selectedAsset.title} 
+                        className={`max-w-full max-h-[80vh] object-contain shadow-2xl rounded-sm ${selectedAsset.is_official ? 'border-2 border-yellow-500/50 shadow-[0_0_50px_rgba(234,179,8,0.2)]' : ''}`} 
+                        onClick={(e) => { e.stopPropagation(); setSelectedAsset(null); }} 
+                    />
                 </div>
                 
                 <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center pointer-events-none">
