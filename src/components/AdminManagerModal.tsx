@@ -15,7 +15,7 @@ export default function AdminManagerModal({ isOpen, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
-  // Завантажуємо список адмінів
+  
   const fetchAdmins = async () => {
     const { data } = await supabase.from('admins').select('*').order('created_at');
     if (data) setAdmins(data);
@@ -31,7 +31,7 @@ export default function AdminManagerModal({ isOpen, onClose }: Props) {
     try {
       await addNewAdminAction(newId);
       setNewId('');
-      fetchAdmins(); // Оновлюємо список
+      fetchAdmins(); 
     } catch (e: any) {
       alert(e.message);
     } finally {
@@ -61,7 +61,7 @@ export default function AdminManagerModal({ isOpen, onClose }: Props) {
             <h2 className="text-xl font-bold">Manage Admins</h2>
         </div>
 
-        {/* Форма додавання */}
+        
         <div className="flex gap-2 mb-6">
             <input 
                 type="text" 
@@ -79,7 +79,7 @@ export default function AdminManagerModal({ isOpen, onClose }: Props) {
             </button>
         </div>
 
-        {/* Список адмінів */}
+       
         <div className="space-y-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
             {admins.map((admin) => (
                 <div key={admin.id} className="flex justify-between items-center p-3 bg-[#161616] rounded-lg border border-white/5">

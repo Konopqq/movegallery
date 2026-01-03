@@ -2,11 +2,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useSession } from 'next-auth/react';
-import { TrashIcon, CheckIcon, ArrowDownTrayIcon, PencilSquareIcon, XMarkIcon, FunnelIcon, ExclamationTriangleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, CheckIcon, ArrowDownTrayIcon, PencilSquareIcon, XMarkIcon, FunnelIcon, ExclamationTriangleIcon, UserGroupIcon, StarIcon } from '@heroicons/react/24/outline';
+import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { deleteAssetAction, updateStatusAction, updateAssetInfoAction } from '../actions';
 import AdminManagerModal from '@/components/AdminManagerModal';
 
-const CATEGORIES = ['logo', 'moveus', 'fon', 'text', 'art'];
+const CATEGORIES = ['logo', 'moveus', 'fon', 'text', 'art', 'apparel'];
 type FilterType = 'all' | 'pending' | 'approved' | 'rejected';
 
 export default function AdminPage() {
@@ -16,6 +17,7 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editCategory, setEditCategory] = useState('');
+  const [editIsOfficial, setEditIsOfficial] = useState(false);
   const [newFile, setNewFile] = useState<File | null>(null);
   const [itemToDelete, setItemToDelete] = useState<{id: string, path: string} | null>(null);
   const [isAdminManagerOpen, setIsAdminManagerOpen] = useState(false);
@@ -72,7 +74,7 @@ export default function AdminPage() {
         if (error) throw error;
         newFilePath = fileName;
       }
-      await updateAssetInfoAction(id, editTitle, editCategory, newFilePath, oldFilePath);
+      await updateAssetInfoAction(id, editTitle, editCategory, editIsOfficial, newFilePath, oldFilePath);
       setEditingId(null);
       fetchAssets(); 
     } catch (e: any) {
@@ -86,6 +88,7 @@ export default function AdminPage() {
     setEditingId(asset.id);
     setEditTitle(asset.title);
     setEditCategory(asset.category || 'art');
+    setEditIsOfficial(asset.is_official || false);
     setNewFile(null);
   };
 
@@ -129,9 +132,16 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {filteredAssets.map((asset) => (
-          <div key={asset.id} className={`bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden flex flex-col shadow-xl relative group transition-opacity duration-200 ${actionLoading === asset.id ? 'opacity-50 pointer-events-none' : ''}`}>
+          <div key={asset.id} className={`bg-[#0A0A0A] border rounded-2xl overflow-hidden flex flex-col shadow-xl relative group transition-opacity duration-200 ${actionLoading === asset.id ? 'opacity-50 pointer-events-none' : ''} ${asset.is_official ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.1)]' : 'border-white/10'}`}>
             <div className="relative h-64 w-full bg-[#020202] flex items-center justify-center overflow-hidden">
                 <img src={editingId === asset.id && newFile ? URL.createObjectURL(newFile) : `https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${asset.file_path}`} alt={asset.title} className="w-full h-full object-contain p-4" />
+                
+                {asset.is_official && (
+                   <div className="absolute top-3 right-14 z-20">
+                      <img src="/official.png" className="w-8 h-8 drop-shadow-lg" alt="Official" />
+                   </div>
+                )}
+
                 <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border z-10 ${asset.status === 'approved' ? 'bg-green-900/40 text-green-400 border-green-500/30' : asset.status === 'rejected' ? 'bg-red-900/40 text-red-400 border-red-500/30' : 'bg-yellow-900/40 text-yellow-400 border-yellow-500/30'}`}>
                     {asset.status}
                 </div>
@@ -147,6 +157,12 @@ export default function AdminPage() {
                         <select value={editCategory} onChange={(e) => setEditCategory(e.target.value)} className="w-full bg-[#151515] border border-gray-700 text-white text-sm rounded-lg p-2 outline-none focus:border-blue-500">
                             {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
+                        
+                        <div onClick={() => setEditIsOfficial(!editIsOfficial)} className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer border ${editIsOfficial ? 'bg-yellow-500/10 border-yellow-500 text-yellow-500' : 'bg-[#151515] border-gray-700 text-gray-500'}`}>
+                            {editIsOfficial ? <StarIconSolid className="h-5 w-5" /> : <StarIcon className="h-5 w-5" />}
+                            <span className="text-sm font-bold">Official Asset</span>
+                        </div>
+
                         <input type="file" ref={fileInputRef} onChange={(e) => setNewFile(e.target.files?.[0] || null)} className="w-full text-xs text-gray-400"/>
                         <div className="flex gap-2 mt-2">
                             <button onClick={() => handleSaveEdit(asset.id, asset.file_path)} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2 rounded-lg">Save</button>
@@ -157,9 +173,11 @@ export default function AdminPage() {
                     <>
                         <div className="flex justify-between items-start">
                             <div className="overflow-hidden">
-                                <h3 className="text-lg font-bold text-white leading-snug truncate">{asset.title}</h3>
+                                <h3 className={`text-lg font-bold leading-snug truncate ${asset.is_official ? 'text-yellow-400' : 'text-white'}`}>{asset.title}</h3>
                                 <div className="flex items-center gap-2 mt-1">
-                                    <span className="text-[10px] text-gray-500 font-mono truncate max-w-[150px]">By: {asset.user_name || asset.discord_user_id}</span>
+                                    <span className="text-[10px] text-gray-500 font-mono truncate max-w-[150px]">
+                                        By: {asset.is_official ? <span className="text-yellow-500 font-bold">Movement</span> : (asset.user_name || asset.discord_user_id)}
+                                    </span>
                                     <span className="text-[10px] uppercase bg-white/5 px-1.5 rounded text-gray-400 border border-white/5">{asset.category}</span>
                                 </div>
                             </div>

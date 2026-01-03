@@ -1,12 +1,13 @@
 "use client";
 import Link from 'next/link';
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useState, useEffect, Suspense } from 'react'; 
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import UploadModal from './UploadModal';
 import NotificationBell from './NotificationBell';
-
+import SearchBar from './SearchBar';
+import { StarIcon } from '@heroicons/react/24/solid';
 
 function NavbarInner() {
   const { data: session } = useSession();
@@ -18,7 +19,6 @@ function NavbarInner() {
   const [isAdmin, setIsAdmin] = useState(false);
   
   const supabase = createClient();
-
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -53,37 +53,39 @@ function NavbarInner() {
     setIsModalOpen(true);
   };
 
+  const CATEGORIES = ['all', 'official', 'logo', 'moveus', 'fon', 'text', 'art', 'apparel'];
+
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-[#050505] border-b border-white/10 h-16 flex items-center justify-between px-6">
-        
+      <nav className="fixed top-0 left-0 w-full z-50 bg-[#050505]/90 backdrop-blur-md border-b border-white/10 h-16 flex items-center justify-between px-6">
         
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition shrink-0">
           <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
-          <span className="text-lg font-bold text-white whitespace-nowrap">
+          <span className="text-lg font-bold text-white whitespace-nowrap hidden sm:block">
             Move Industries
           </span>
         </Link>
 
-        
-        <div className="hidden md:flex items-center gap-1 bg-[#111] p-1 rounded-lg border border-white/5">
-          {['all', 'logo', 'moveus', 'fon', 'text', 'art'].map((cat) => (
+        <div className="hidden lg:flex items-center gap-1 bg-[#111] p-1 rounded-lg border border-white/5">
+          {CATEGORIES.map((cat) => (
               <button 
                   key={cat}
                   onClick={() => setFilter(cat)}
-                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
+                  className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition flex items-center gap-1 ${
                       currentFilter === cat 
-                      ? 'bg-white text-black' 
+                      ? 'bg-white text-black shadow-lg scale-105' 
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
+                  } ${cat === 'official' ? 'text-yellow-500 hover:text-yellow-400' : ''}`}
               >
+                  {cat === 'official' && <StarIcon className="h-3 w-3" />}
                   {cat.charAt(0).toUpperCase() + cat.slice(1)}
               </button>
           ))}
         </div>
 
-        
         <div className="flex items-center gap-4">
+          
+          <SearchBar />
           
           {session && <NotificationBell />}
           
@@ -92,7 +94,7 @@ function NavbarInner() {
              className="flex items-center gap-2 px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-md transition"
           >
              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-             <span className="text-sm font-bold text-white">Upload</span>
+             <span className="text-sm font-bold text-white hidden sm:inline">Upload</span>
           </button>
 
           {session ? (
@@ -137,7 +139,6 @@ function NavbarInner() {
     </>
   );
 }
-
 
 export default function Navbar() {
   return (

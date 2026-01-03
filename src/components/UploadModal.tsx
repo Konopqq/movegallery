@@ -81,7 +81,6 @@ export default function UploadModal({ isOpen, onClose, isAdmin }: UploadModalPro
       if (upErr) throw upErr;
 
       const status = isAdmin ? 'approved' : 'pending';
-
       
       const { error: dbErr } = await supabase.from('assets').insert([{
         title: title,
@@ -90,7 +89,8 @@ export default function UploadModal({ isOpen, onClose, isAdmin }: UploadModalPro
         discord_user_id: userId,
         user_name: userName,     
         user_avatar: userAvatar, 
-        status: status
+        status: status,
+        is_official: false 
       }]);
 
       if (dbErr) throw dbErr;
@@ -124,7 +124,7 @@ export default function UploadModal({ isOpen, onClose, isAdmin }: UploadModalPro
         </div>
       )}
 
-      <div className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-md p-6 relative shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-md p-6 relative shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar">
         <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-white tracking-tight">Upload Asset</h2>
             <button onClick={onClose} className="text-gray-400 hover:text-white transition bg-white/5 p-1 rounded-full">
@@ -159,7 +159,7 @@ export default function UploadModal({ isOpen, onClose, isAdmin }: UploadModalPro
           <div>
             <label className="block text-xs text-gray-500 mb-1.5 uppercase font-bold tracking-wider">Category</label>
             <div className="grid grid-cols-3 gap-2">
-              {['logo', 'moveus', 'fon', 'text', 'art'].map(cat => (
+              {['logo', 'moveus', 'fon', 'text', 'art', 'apparel'].map(cat => (
                 <button key={cat} onClick={() => setCategory(cat)} className={`py-2.5 rounded-lg text-sm font-bold border transition-all ${category === cat ? 'bg-[#4ADE80] text-black border-[#4ADE80] shadow-[0_0_15px_rgba(74,222,128,0.2)]' : 'bg-[#1A1A1A] text-gray-400 border-white/10 hover:border-white/30 hover:text-white'}`}>
                   {cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </button>
