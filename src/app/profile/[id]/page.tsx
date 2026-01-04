@@ -40,7 +40,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] pt-24 pb-10 px-6">
+    <div className="min-h-screen bg-transparent pt-24 pb-10 px-6">
       <div className="max-w-7xl mx-auto">
         
         {!loading && assets.length > 0 && (
@@ -55,7 +55,7 @@ export default function ProfilePage() {
             <div>
               <h1 className="text-3xl font-bold text-white mb-1">{userInfo.user_name}</h1>
               <div className="flex items-center gap-3">
-                 <span className="text-sm font-mono text-gray-500 bg-[#111] px-2 py-1 rounded border border-white/5">ID: {id}</span>
+                 <span className="text-sm font-mono text-gray-500 bg-[#111]/50 px-2 py-1 rounded border border-white/5">ID: {id}</span>
                  <span className="text-sm text-gray-400">Total Works: <strong className="text-white">{assets.length}</strong></span>
               </div>
             </div>
@@ -72,10 +72,16 @@ export default function ProfilePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {assets.map((asset) => (
-              <div key={asset.id} onClick={() => setSelectedAsset(asset)} className="group relative bg-[#111] border border-white/10 rounded-xl overflow-hidden shadow-lg transition hover:border-white/30 cursor-pointer">
-                <div className="aspect-square bg-black relative">
+              <div key={asset.id} onClick={() => setSelectedAsset(asset)} className={`group relative bg-[#111]/80 backdrop-blur-sm border rounded-xl overflow-hidden shadow-lg transition hover:scale-[1.02] cursor-pointer ${asset.is_official ? 'border-yellow-500/60 shadow-[0_0_20px_rgba(234,179,8,0.15)]' : 'border-white/10 hover:border-white/30'}`}>
+                <div className="aspect-square bg-black/50 relative">
                   <img src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${asset.file_path}`} alt={asset.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition duration-500" />
                   
+                  {asset.is_official && (
+                    <div className="absolute top-3 right-3 z-10 w-6 h-6 drop-shadow-lg">
+                        <img src="/official.png" alt="Official" className="w-full h-full object-contain" />
+                    </div>
+                  )}
+
                   <div className={`absolute top-3 left-3 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md shadow-lg border flex items-center gap-1.5 ${
                     asset.status === 'approved' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 
                     asset.status === 'rejected' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 
@@ -92,8 +98,8 @@ export default function ProfilePage() {
                   </button>
                 </div>
 
-                <div className="p-4 border-t border-white/5 bg-[#161616]">
-                  <h3 className="text-white font-bold text-sm truncate">{asset.title}</h3>
+                <div className={`p-4 border-t ${asset.is_official ? 'border-yellow-500/20 bg-gradient-to-b from-[#161616]/90 to-yellow-900/20' : 'border-white/5 bg-[#161616]/90'}`}>
+                  <h3 className={`font-bold text-sm truncate ${asset.is_official ? 'text-yellow-400' : 'text-white'}`}>{asset.title}</h3>
                   <div className="flex justify-between items-center mt-2">
                     <span className="text-[10px] uppercase text-gray-500 font-bold bg-[#222] px-2 py-0.5 rounded">{asset.category}</span>
                     <span className="text-[10px] text-gray-600 font-mono">{new Date(asset.created_at).toLocaleDateString()}</span>
@@ -105,10 +111,15 @@ export default function ProfilePage() {
         )}
 
         {selectedAsset && (
-            <div onClick={() => setSelectedAsset(null)} className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out">
+            <div onClick={() => setSelectedAsset(null)} className="fixed inset-0 z-[100] bg-black/20 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out">
                 <button className="absolute top-5 right-5 text-gray-400 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition"><XMarkIcon className="h-8 w-8" /></button>
-                <img src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${selectedAsset.file_path}`} alt={selectedAsset.title} className="max-w-full max-h-full object-contain shadow-2xl rounded-sm" onClick={(e) => { e.stopPropagation(); setSelectedAsset(null); }} />
-                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-center pointer-events-none">
+                <img 
+                    src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${selectedAsset.file_path}`} 
+                    alt={selectedAsset.title} 
+                    className="max-w-full max-h-[80vh] object-contain shadow-2xl rounded-sm" 
+                    onClick={(e) => { e.stopPropagation(); setSelectedAsset(null); }} 
+                />
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center pointer-events-none">
                     <p className="text-white font-bold text-lg text-shadow">{selectedAsset.title}</p>
                     <div className={`mt-2 px-3 py-1 inline-flex items-center gap-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                         selectedAsset.status === 'approved' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 

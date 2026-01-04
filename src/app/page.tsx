@@ -19,14 +19,12 @@ function HomeContent() {
       setLoading(true);
       let query = supabase.from('assets').select('*').eq('status', 'approved').order('created_at', { ascending: false });
 
-      
       if (filter === 'official') {
          query = query.eq('is_official', true);
       } else if (filter !== 'all') {
          query = query.eq('category', filter);
       }
 
-      
       if (searchQuery) {
          query = query.or(`title.ilike.%${searchQuery}%,user_name.ilike.%${searchQuery}%`);
       }
@@ -56,7 +54,7 @@ function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] pt-24 pb-10 px-6">
+    <div className="min-h-screen bg-transparent pt-24 pb-10 px-6">
       <div className="max-w-7xl mx-auto">
         
         {loading ? (
@@ -71,13 +69,20 @@ function HomeContent() {
              </p>
            </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
             {assets.map((asset) => (
-              <div key={asset.id} onClick={() => setSelectedAsset(asset)} className={`group relative bg-[#111] border rounded-xl overflow-hidden shadow-lg transition hover:scale-[1.02] cursor-pointer ${asset.is_official ? 'border-yellow-500/60 shadow-[0_0_20px_rgba(234,179,8,0.15)]' : 'border-white/10 hover:border-white/30'}`}>
+              <div 
+                key={asset.id} 
+                onClick={() => setSelectedAsset(asset)} 
+                className={`break-inside-avoid mb-4 group relative bg-transparent border rounded-xl overflow-hidden shadow-lg transition hover:scale-[1.02] cursor-pointer ${asset.is_official ? 'border-yellow-500/60 shadow-[0_0_20px_rgba(234,179,8,0.15)]' : 'border-white/10 hover:border-white/30'}`}
+              >
                 
-                <div className="aspect-square bg-black relative">
-                  <img src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${asset.file_path}`} alt={asset.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition duration-500" />
-                  
+                <div className="relative w-full h-auto">
+                  <img 
+                    src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${asset.file_path}`} 
+                    alt={asset.title} 
+                    className="w-full h-auto object-contain transition duration-500 block" 
+                  />
                   
                   {asset.is_official && (
                     <div className="absolute top-3 left-3 z-10 w-8 h-8 drop-shadow-lg">
@@ -90,7 +95,7 @@ function HomeContent() {
                   </button>
                 </div>
 
-                <div className={`p-4 border-t ${asset.is_official ? 'border-yellow-500/20 bg-gradient-to-b from-[#161616] to-yellow-900/10' : 'border-white/5 bg-[#161616]'}`}>
+                <div className={`p-4 border-t ${asset.is_official ? 'border-yellow-500/20 bg-transparent' : 'border-white/5 bg-transparent'}`}>
                   <h3 className={`font-bold text-sm truncate ${asset.is_official ? 'text-yellow-400' : 'text-white'}`}>{asset.title}</h3>
                   <div className="flex justify-between items-center mt-2">
                     <span className="text-[10px] uppercase text-gray-500 font-bold bg-[#222] px-2 py-0.5 rounded">
@@ -106,24 +111,22 @@ function HomeContent() {
           </div>
         )}
 
-        
         {selectedAsset && (
-            <div onClick={() => setSelectedAsset(null)} className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out">
+            <div onClick={() => setSelectedAsset(null)} className="fixed inset-0 z-[100] bg-black/20 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out">
                 <button className="absolute top-5 right-5 text-gray-400 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition">
                     <XMarkIcon className="h-8 w-8" />
                 </button>
                 
-                <div className="relative max-w-full max-h-full">
-                    
+                <div className="relative max-w-full max-h-full flex items-center justify-center">
                     <img 
                         src={`https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${selectedAsset.file_path}`} 
                         alt={selectedAsset.title} 
-                        className={`max-w-full max-h-[80vh] object-contain shadow-2xl rounded-sm ${selectedAsset.is_official ? 'border-2 border-yellow-500/50 shadow-[0_0_50px_rgba(234,179,8,0.2)]' : ''}`} 
+                        className="max-w-full max-h-[85vh] object-contain shadow-2xl rounded-sm" 
                         onClick={(e) => { e.stopPropagation(); setSelectedAsset(null); }} 
                     />
                 </div>
                 
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center pointer-events-none">
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center pointer-events-none w-full px-4">
                     <p className={`font-bold text-lg text-shadow ${selectedAsset.is_official ? 'text-yellow-400' : 'text-white'}`}>{selectedAsset.title}</p>
                     <p className={`text-sm mt-1 ${selectedAsset.is_official ? 'text-yellow-600 font-bold' : 'text-gray-400'}`}>
                         {selectedAsset.is_official ? 'Official Asset by Movement' : `By ${selectedAsset.user_name || 'Unknown'}`}
@@ -139,7 +142,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-transparent" />}>
       <HomeContent />
     </Suspense>
   );

@@ -111,7 +111,7 @@ export default function AdminPage() {
   if (status === "loading") return <div className="flex items-center justify-center h-screen text-gray-500">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white p-6 md:p-12 relative">
+    <div className="min-h-screen bg-transparent text-white p-6 md:p-12 relative">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
          <div className="flex flex-col gap-1">
              <div className="text-gray-500 text-sm font-mono">
@@ -132,8 +132,8 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {filteredAssets.map((asset) => (
-          <div key={asset.id} className={`bg-[#0A0A0A] border rounded-2xl overflow-hidden flex flex-col shadow-xl relative group transition-opacity duration-200 ${actionLoading === asset.id ? 'opacity-50 pointer-events-none' : ''} ${asset.is_official ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.1)]' : 'border-white/10'}`}>
-            <div className="relative h-64 w-full bg-[#020202] flex items-center justify-center overflow-hidden">
+          <div key={asset.id} className={`bg-[#0A0A0A]/80 backdrop-blur-sm border rounded-2xl overflow-hidden flex flex-col shadow-xl relative group transition-opacity duration-200 ${actionLoading === asset.id ? 'opacity-50 pointer-events-none' : ''} ${asset.is_official ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.1)]' : 'border-white/10'}`}>
+            <div className="relative h-64 w-full bg-[#020202]/50 flex items-center justify-center overflow-hidden">
                 <img src={editingId === asset.id && newFile ? URL.createObjectURL(newFile) : `https://bfcuoffgxfdkzjloousm.supabase.co/storage/v1/object/public/uploads/${asset.file_path}`} alt={asset.title} className="w-full h-full object-contain p-4" />
                 
                 {asset.is_official && (
@@ -150,7 +150,7 @@ export default function AdminPage() {
                 </button>
             </div>
 
-            <div className="p-6 flex-1 flex flex-col gap-4 relative bg-[#0A0A0A]">
+            <div className="p-6 flex-1 flex flex-col gap-4 relative bg-transparent">
                 {editingId === asset.id ? (
                     <div className="flex flex-col gap-3">
                         <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="w-full bg-[#151515] border border-gray-700 text-white text-sm rounded-lg p-2 outline-none focus:border-blue-500"/>
