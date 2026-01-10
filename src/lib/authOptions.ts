@@ -11,7 +11,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, token }) {
       if (session?.user) {
-        // Додаємо ID користувача в сесію
+        
         (session.user as any).id = token.sub;
       }
       return session;
@@ -23,6 +23,6 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
-  // Це важливо для збереження сесії
+  
   secret: process.env.NEXTAUTH_SECRET, 
 };

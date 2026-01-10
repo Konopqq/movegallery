@@ -16,7 +16,7 @@ export default function NotificationBell() {
     const userId = (session?.user as any)?.id;
     if (!userId) return;
 
-    // Отримуємо останні 10 робіт юзера
+    
     const { data } = await supabase
       .from('assets')
       .select('id, title, status, created_at')
@@ -26,16 +26,16 @@ export default function NotificationBell() {
 
     if (data) {
       setNotifications(data);
-      // Логіка "червоної крапки": якщо є статус pending або щось змінилось (спрощено)
+      
       const hasPending = data.some(n => n.status === 'pending');
-      // Показуємо крапку, якщо є нові зміни, або просто якщо список не пустий і ми його ще не відкривали
+      
       if (data.length > 0 && !isOpen) setHasUnread(true);
     }
   };
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 5000); // Оновлення кожні 5 сек
+    const interval = setInterval(fetchNotifications, 5000); 
 
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
