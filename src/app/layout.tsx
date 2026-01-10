@@ -12,13 +12,11 @@ export const metadataBase = new URL('https://movegallery-bice.vercel.app');
 export const metadata: Metadata = {
   title: "MOVE Gallery",
   description: "The official Move Industries ecosystem",
+
   icons: {
-    icon: '/logo-icon.png',
-  },
-  openGraph: {
-    title: "MOVE Gallery",
-    description: "The official Move Industries ecosystem",
-    
+    icon: '/brand-logo.png',
+    shortcut: '/brand-logo.png',
+    apple: '/brand-logo.png',
   },
 };
 
@@ -36,7 +34,6 @@ export default function RootLayout({
         <SessionProvider>
           <Provider>
             <Navbar />
-            
             <main className="container mx-auto pt-4">
               {children}
             </main>
